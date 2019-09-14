@@ -86,32 +86,3 @@ each 'log' entry map may consist of
 ;; ^ THIS works for profiling a bunch of forms
 
 (prof-n (+ 2 3) (- 7 6) (str "42" "abc"))
-
-
-
-  
-  
-  
-  
-(comment """
-So, I can profile one form and I can profile an arbitrary n forms.
-Now I need to be able to drill down into the inputs recursivelly.
-Such that, if the input is something like:
-(foo (bar 1 2 3)
-     (baz 4 5 6)
-     (spamalot (str oranges (+ mango banana)))
-I need to be able to collect merics for all the functions invoked:
-- foo 
-- bar
-- baz 
-- spamalot
-- str
-- +
-
-;; this is not even talking about the functions that those functions call
-;; we're talking `self time` only here
-  
-;; possibly defn prof-wrap that only transforms lists like in ~@map
-;; and use postwalk or something to wrap the entire expression tree 
-;; from the inside out
-""")
