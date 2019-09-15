@@ -41,7 +41,7 @@
 
 (defn wrap-tictoc
   [form]
-  `(let [fn-key# (-> '~form first fn-name)]
+  `(let [fn-key# (-> '~form first fn-name gensym)]
     (tic! fn-key#)
     (let [ret# ~form]
       (toc! fn-key#)
