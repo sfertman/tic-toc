@@ -15,7 +15,7 @@
 (defn toc
   ([] (toc :default-timer))
   ([timer] (- (now) (get @timers timer)))
-  ([timer callback] (callback timers timer)))
+  ([timer callback] (callback timers timer))) ;; did I want to add last argument here to be returned after callback?
 
 (defn clear!
   ([] (clear! :default-timer))
@@ -37,17 +37,22 @@
         (collect!* t dt)
         dt))))
 
-(defmacro fn-name [f] `(-> ~f resolve symbol keyword)) ;; <-- fn-name should prolly be a function
+(defmacro fn-name [f] `(-> ~f resolve symbol keyword)) ;; <-- fn-name should prolly be a function -- still not sure about this
 
+(defn fn-key [form] (-> form first resolve symbol keyword gensym))
 (defn wrap-tictoc
   [form]
-  `(let [fn-key# (-> '~form first fn-name gensym)]
-    (tic! fn-key#)
-    (let [ret# ~form]
-      (toc! fn-key#)
-      ret#)))
+  (let [fn-maybe (first form)]
+    (if (ifn? fn-maybe)
+      `(let [fn-key# (fn-key '~form)]
+        (tic! fn-key#)
+        (let [ret# ~form]
+          (toc! fn-key#)
+          ret#))
+      fn-maybe)))
 
-(defmacro prof-1 [form] (wrap-tictoc form))
+(defmacro prof-1 [form]
+  (wrap-tictoc form))
 
 (defmacro prof-n [& forms] `(do ~@(map wrap-tictoc forms)))
 
