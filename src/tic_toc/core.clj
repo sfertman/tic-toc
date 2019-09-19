@@ -40,16 +40,51 @@
 (defmacro fn-name [f] `(-> ~f resolve symbol keyword)) ;; <-- fn-name should prolly be a function -- still not sure about this
 
 (defn fn-key [form] (-> form first resolve symbol keyword gensym))
+; (defn wrap-tictoc- ;; obsolete
+;   [form]
+;   (let [fn-maybe (first form)]
+;     (if (ifn? fn-maybe)
+;       `(let [fn-key# (fn-key '~form)]
+;         (tic! fn-key#)
+;         (let [ret# ~form]
+;           (toc! fn-key#)
+;           ret#))
+;       fn-maybe)))
+
+(defn wrap-tictoc*
+  [form]
+  `(let [fn-key# (fn-key '~form)] ;; <-- I actually want the result of the (fn-key ...) here!
+    (tic! fn-key#)
+    (let [ret# ~form]
+      (toc! fn-key#)
+      ret#)))
+
+(defn fn-call? ;; this seems to work for the 80% case
+  [form]
+  (if (instance? clojure.lang.PersistentList form)
+    (try
+      (if-let [fn-maybe (first form)]
+        (ifn? (resolve fn-maybe))
+        false)
+      (catch Exception e false))))
+
 (defn wrap-tictoc
   [form]
-  (let [fn-maybe (first form)]
-    (if (ifn? fn-maybe)
-      `(let [fn-key# (fn-key '~form)]
-        (tic! fn-key#)
-        (let [ret# ~form]
-          (toc! fn-key#)
-          ret#))
-      fn-maybe)))
+  (if (fn-call? form)
+    (wrap-tictoc* form)
+    form))
+
+
+  ; (if (instance? clojure.lang.PersistentList form)
+  ;   (let [fn-maybe (first form)]
+  ;     (prn "this is fn-maybe" fn-maybe)
+  ;     (if (ifn? fn-maybe)
+  ;       (do (prn fn-maybe "fn-maybe is actual fn")
+  ;       (wrap-tictoc* form))
+  ;       form))
+  ;   form))
+
+(pprint (wrap-tictoc '(fnfn 0 8 fgfg)))
 
 (defmacro prof-1 [form]
   (wrap-tictoc form))
@@ -67,3 +102,11 @@
 
 
 (prof-n (+ 2 3) (- 7 6) (str "42" "abc"))
+
+
+(def x '(+ 9 8))
+(def y '(9 8 7))
+(def z '(gh fnf spl))
+
+
+
