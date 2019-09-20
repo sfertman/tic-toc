@@ -37,37 +37,15 @@
         (collect!* t dt)
         dt))))
 
-(defmacro fn-name [f] `(-> ~f resolve symbol keyword)) ;; <-- fn-name should prolly be a function -- still not sure about this
-
 (defn fn-key [form] (-> form first resolve symbol keyword gensym))
-; (defn wrap-tictoc* ;; obsolete
-;   [form]
-;   (let [fn-maybe (first form)]
-;     (if (ifn? fn-maybe)
-;       `(let [fn-key# (fn-key '~form)]
-;         (tic! fn-key#)
-;         (let [ret# ~form]
-;           (toc! fn-key#)
-;           ret#))
-;       fn-maybe)))
-
-; (defn wrap-tictoc*
-;   [form]
-;   `(let [fn-key# (fn-key '~form)] ;; <-- I actually want the result of the (fn-key ...) here!
-;     (tic! fn-key#)
-;     (let [ret# ~form]
-;       (toc! fn-key#)
-;       ret#)))
 
 (defn wrap-tictoc*
   [form]
-  (let [fnk (fn-key form)] ;; <-- I suspect something not working here
-    `(do
-      (tic! ~fnk)
-      (let [ret# ~form]
-        (toc! ~fnk)
-        ret#))))
-
+  `(let [fnk# '~(fn-key form)]
+    (tic! fnk#)
+    (let [ret# ~form]
+      (toc! fnk#)
+      ret#)))
 
 (defn fn-call? ;; this seems to work for the 80% case
   [form]
@@ -86,7 +64,7 @@
 
 (pprint (wrap-tictoc '(fnfn 0 8 fgfg)))
 
-(defmacro prof-1 [form] `(wrap-tictoc ~form))
+(defmacro prof-1 [form] (wrap-tictoc form))
 
 (defmacro prof-n [& forms] `(do ~@(map wrap-tictoc forms)))
 
