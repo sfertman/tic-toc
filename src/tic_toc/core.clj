@@ -1,6 +1,6 @@
 (ns tic-toc.core
   (:require
-    [clojure.pprint :refer [pprint]]))
+    [clojure.walk :refer [postwalk]]))
 
 ;;; timers
 (defn- now [] (System/nanoTime))
@@ -62,26 +62,4 @@
     (wrap-tictoc* form)
     form))
 
-(pprint (wrap-tictoc '(fnfn 0 8 fgfg)))
-
-(defmacro prof-1 [form] (wrap-tictoc form))
-
-(defmacro prof-n [& forms] `(do ~@(map wrap-tictoc forms)))
-
-(def mx1 (comp pprint macroexpand-1))
-
-;; this macro must return something to indicate that f is not something that can be invoked
-;; nil perhaps? -- TODO later
-
-
-; (prof-1 (byte-array [1 2 3 4]))
-
-; (prof-n (+ 2 3) (- 7 6) (str "42" "abc"))
-
-
-(def x '(+ 9 8))
-(def y '(9 8 7))
-(def z '(gh fnf spl))
-
-
-
+(defmacro profile [form] (postwalk wrap-tictoc form))
