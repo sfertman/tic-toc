@@ -37,7 +37,7 @@
         (collect!* t dt)
         dt))))
 
-(defn fn-key [form] (-> form first resolve symbol keyword gensym))
+(defn fn-key [form] (-> form first resolve symbol (str "__") keyword gensym))
 
 (defn wrap-tictoc*
   [form]
