@@ -76,6 +76,6 @@
      :cnt cnt
      :avg avg}))
 
-(defn summarizer [m m*] (update m (-> m* :fn-name fn-name) add-stat(:time-ns m*)))
+(defn summarizer [m m*] (update m (-> m* :fn-name fn-name) add-stat (:time-ns m*)))
 
 (defn summary [mtr] (reduce summarizer {} @mtr))
