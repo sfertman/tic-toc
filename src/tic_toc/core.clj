@@ -63,3 +63,19 @@
     form))
 
 (defmacro profile [form] (postwalk wrap-tictoc form))
+
+(defn matcher [s] (re-matches #":(.*)__\d+$" s))
+(defn fn-name [fnk] (-> fnk str matcher second))
+
+(defn add-stat
+  [X x]
+  (let [tot (+ (or (:tot X) 0.0) x)
+        cnt (+ (or (:cnt X) 0) 1)
+        avg (/ tot cnt)]
+    {:tot tot
+     :cnt cnt
+     :avg avg}))
+
+(defn summarizer [m m*] (update m (-> m* :fn-name fn-name) add-stat(:time-ns m*)))
+
+(defn summary [mtr] (reduce summarizer {} @mtr))
