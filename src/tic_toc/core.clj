@@ -62,7 +62,7 @@
     (wrap-tictoc* form)
     form))
 
-(defmacro profile [form] (postwalk wrap-tictoc form))
+(defmacro profile [& forms] `(do ~@(map (partial postwalk wrap-tictoc) forms)))
 
 (defn matcher [s] (re-matches #":(.*)__\d+$" s))
 (defn fn-name [fnk] (-> fnk str matcher second))
