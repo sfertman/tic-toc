@@ -1,21 +1,22 @@
 (ns tic-toc.core
   (:require
     [clojure.walk :refer [postwalk]]
-    [tic-toc.timers :refer :all]))
+    [tic-toc.metrics :as mtr]
+    [tic-toc.timers :as tt]))
 
-;;; metrics
-(defonce metrics (atom []))
+(def metrics (mtr/create-collector!))
 
-(defn collect! [m] (swap! metrics conj m))
-(defn collect!* [fnk tns] (collect! {:fn-name fnk :time-ns tns}))
+(defn collect!*
+  ([fnk tns] (collect!* fnk tns {}))
+  ([fnk tns m] (mtr/collect! metrics {:fn-name fnk :time-ns tns :meta m})))
 
 (defn toc! ;; <-- using toc callback to clean timers up and collect metrics
   [timer]
-  (toc
+  (tt/toc
     timer
-    (fn [_ t]
-      (let [dt (toc t)]
-        (clear! t)
+    (fn [_ t] ;; <-- ignore 1st arg (timers atom)
+      (let [dt (tt/toc t)]
+        (tt/clear! t)
         (collect!* t dt)
         dt))))
 
@@ -24,7 +25,7 @@
 (defn wrap-tictoc*
   [form]
   `(let [fnk# '~(fn-key form)]
-    (tic! fnk#)
+    (tt/tic! fnk#)
     (let [ret# ~form]
       (toc! fnk#)
       ret#)))
@@ -46,18 +47,5 @@
 
 (defmacro profile [& forms] `(do ~@(map (partial postwalk wrap-tictoc) forms)))
 
-(defn matcher [s] (re-matches #":(.*)__\d+$" s))
-(defn fn-name [fnk] (-> fnk str matcher second))
+(defn summary [] (mtr/summary metrics))
 
-(defn add-stat
-  [X x]
-  (let [tot (+ (or (:tot X) 0.0) x)
-        cnt (+ (or (:cnt X) 0) 1)
-        avg (/ tot cnt)]
-    {:tot tot
-     :cnt cnt
-     :avg avg}))
-
-(defn summarizer [m m*] (update m (-> m* :fn-name fn-name) add-stat (:time-ns m*)))
-
-(defn summary [mtr] (reduce summarizer {} @mtr))
