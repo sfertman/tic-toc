@@ -1,5 +1,5 @@
 # tic-toc
-Code profiler for clojure in clojure. Very basic for now but possibly offers a quick and dirty way for exploratory optimization of bottlenecks. Does not drill down into fns definitions; does a simple postwalk on the input form.
+Clojure code profiler. Very basic for now but possibly offers a quick and dirty way for exploratory optimization of bottlenecks. Does not drill down into fns definitions; does a simple postwalk on the input forms.<sup>*</sup>
 
 ## Profiling
 Just wrap whatever with `profile` macro
@@ -63,4 +63,18 @@ Alternatively, you can access the raw data and pipe it to your favourite data an
 ;  {:fn-name :clojure.core/doseq__1645, :time-ns 8885768}
 ;  {:fn-name :clojure.core/let__1646, :time-ns 8933516}]
 ; nil
+```
+
+<sup>*</sup> Note that `profile` supports multiple inputs. Will return the value of the last input form. Metrics will be collected in the same atom for all forms and all subsequent calls to `profile`.
+
+```clojure
+(profile
+  (+ 42 43 44 45 46)
+  (- 46 45 44 43 42)
+  (* 1 2 3 4 5 6 7)
+  (/ 46 45 44 43 42))
+```
+To start a fresh profiling session simply reset the metrics atom:
+```clojure
+(reset! metrics [])
 ```
