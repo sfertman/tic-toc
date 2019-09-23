@@ -29,9 +29,9 @@ Just wrap whatever with `profile` macro
 # Run time summary
 Metrics are accumulated in an atom `metrics`. Collects run time in nanoseconds for each unique function call. To see a quick summary use:
 ```clojure
-(require '[tic-toc.core :refer [summary metrics]])
+(require '[tic-toc.core :refer [summary]])
 
-(pprint (summary metrics))
+(pprint (summary))
 
 ; =>
 ; {"clojure.core/range" {:tot 112870.0, :cnt 1.0, :avg 112870.0},
