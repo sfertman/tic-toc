@@ -7,8 +7,8 @@
 (def metrics (mtr/create-collector!))
 
 (defn collect!*
-  ([fnk tns] (collect!* fnk tns {}))
-  ([fnk tns m] (mtr/collect! metrics {:fn-name fnk :time-ns tns :meta m})))
+  ([fn-id t-ns] (collect!* fn-id t-ns {}))
+  ([fn-id t-ns m] (mtr/collect! metrics {:fn-name fn-id :time-ns t-ns :meta m})))
 
 (defn toc! ;; <-- using toc callback to clean timers up and collect metrics
   [timer]
@@ -24,10 +24,10 @@
 
 (defn wrap-tictoc*
   [form]
-  `(let [fnk# '~(fn-key form)]
-    (tt/tic! fnk#)
+  `(let [fn-id# '~(fn-key form)]
+    (tt/tic! fn-id#)
     (let [ret# ~form]
-      (toc! fnk#)
+      (toc! fn-id#)
       ret#)))
 
 (defn fn-call? ;; this seems to work for the 80% case
