@@ -279,7 +279,7 @@
 ;; try to get smart and uses postwalk
 ;; ~~1. fix the damn logic here -- something went wrong deleting prn outputs~~
 ;; ~~2. plug the correct tictoc wrapper whatver it is~~
-;; 3. this is very cool but meta dosn't propagate through more than one layer -- fix this and it's all done!
+;; ~~3. this is very cool but meta dosn't propagate through more than one layer -- fix this and it's all done!~~
 ;; 4. organize this file and delete everything that's not needed
 ;; 5. test
 ;; 6. test
@@ -288,30 +288,31 @@
   [stack form]
   (if (coll? form)
     (let [c (count form)
-          meta' {:args-fns (seq (filter some? (map :fn-id (take c @stack))))}]
-      (prn "meta'" meta')
+          args-meta (filter some? (take c @stack))]
       (swap! stack #(drop c %))
       (if (fn-call? form)
         (let [fn-id' (fn-id form)
-              meta'' (assoc meta' :fn-id fn-id')]
-          (swap! stack conj meta'')
+              meta' (filter some? (map :fn-id args-meta))
+              meta'' (list {:arg-fns meta' :fn-id fn-id'}) #_(assoc meta' :fn-id fn-id')]
+          (swap! stack into meta'')
           (wrap-tictoc** form fn-id' meta''))
-        (do (swap! stack conj meta')
+        (do (swap! stack into args-meta)
             form)))
-    (do (swap! stack conj nil)
+    (do (swap! stack into (list nil))
         form)))
 
 
-(defn postwalk*
-  [inner outer form]
-  (walk (partial postwalk* inner outer) outer form))
 
-(defn postwalk-
-  [inner outer form]
-  (let [stack (atom '())
-        inner' (partial inner stack)
-        outer' (partial outer stack)]
-    (postwalk* inner' outer' form)))
+; (defn postwalk*
+;   [inner outer form]
+;   (walk (partial postwalk* inner outer) outer form))
+
+; (defn postwalk-
+;   [inner outer form]
+;   (let [stack (atom '())
+;         inner' (partial inner stack)
+;         outer' (partial outer stack)]
+;     (postwalk* inner' outer' form)))
 
 (defn postwalk-
   [f form]
