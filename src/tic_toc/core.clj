@@ -9,7 +9,7 @@
 
 (defn collect!*
   ([fn-id t-ns] (collect!* fn-id t-ns {}))
-  ([fn-id t-ns m] (mtr/collect! metrics {:fn-name fn-id :time-ns t-ns :meta m})))
+  ([fn-id t-ns m] (mtr/collect! metrics {:fn-id fn-id :time-ns t-ns :meta m})))
 
 (defn toc! ;; <-- using toc callback to clean timers up and collect metrics
   ([timer] (toc! timer {}))

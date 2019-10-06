@@ -53,15 +53,15 @@ Alternatively, you can access the raw data and pipe it to your favourite data an
 (pprint @merics)
 
 ; =>
-; [{:fn-name :clojure.core/range__1639, :time-ns 96980}
-;  {:fn-name :clojure.core/str__1640, :time-ns 66228}
-;  {:fn-name :clojure.core/println__1641, :time-ns 1506678}
-;  {:fn-name :clojure.core/-__1642, :time-ns 49048}
+; [{:fn-id :clojure.core/range__1639, :time-ns 96980}
+;  {:fn-id :clojure.core/str__1640, :time-ns 66228}
+;  {:fn-id :clojure.core/println__1641, :time-ns 1506678}
+;  {:fn-id :clojure.core/-__1642, :time-ns 49048}
 ;  ...
 ;  ...
 ;  ...
-;  {:fn-name :clojure.core/doseq__1645, :time-ns 8885768}
-;  {:fn-name :clojure.core/let__1646, :time-ns 8933516}]
+;  {:fn-id :clojure.core/doseq__1645, :time-ns 8885768}
+;  {:fn-id :clojure.core/let__1646, :time-ns 8933516}]
 ; nil
 ```
 
