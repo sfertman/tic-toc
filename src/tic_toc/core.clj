@@ -1,7 +1,6 @@
 (ns tic-toc.core
   (:require
-    [clojure.pprint :refer [pprint]] ;; remove in release
-    [clojure.walk :refer [postwalk]]
+    [clojure.walk]
     [tic-toc.metrics :as mtr]
     [tic-toc.timers :as tt]))
 
@@ -23,28 +22,17 @@
         (collect!* t dt m) ;; <-- should separate meta from timers (or mebbe not)
         dt)))))
 
-(defn fn-id [form] (-> form first resolve symbol (str "__") keyword gensym))
+(defn get-fn-id [form] (-> form first resolve symbol (str "__") gensym keyword))
 
-(defn wrap-tictoc* ;; this on is the one that just works
-  [form]
-  `(let [fn-id# '~(fn-id form)]
-    (tt/tic! fn-id#)
-    (let [ret# ~form]
-      (toc! fn-id#)
-      ret#)))
-
-(defn wrap-tictoc** ;; this on is with met data
-  [form fn-id meta-data]
-  `(do
-    (tt/tic! ~fn-id)
-    (let [ret# ~form]
-      (toc! ~fn-id ~meta-data)
-      ret#)))
-
+(defn wrap-tictoc
+  [form fn-id fn-meta]
+  `(let [_# (tt/tic! ~fn-id)
+         ret# ~form]
+    (toc! ~fn-id ~fn-meta)
+    ret#))
 
 (defmacro get-meta* [form] (meta &form)) ;; works!
 (defn get-meta [form] (get-meta* form)) ;; works! but problm is returns this line number! Shieeet
-
 
 (defn fn-call? ;; this seems to work for the 80% case
   [form]
@@ -54,14 +42,6 @@
         (ifn? (resolve fn-maybe))
         false)
       (catch Exception e false))))
-
-(defn wrap-tictoc ;; <-- this guy now needs to walk the form with inner and outter defed above
-  [form]
-  (if (fn-call? form)
-    (wrap-tictoc* form)
-    form))
-
-(defmacro profile [& forms] `(do ~@(map (partial postwalk wrap-tictoc) forms)))
 
 (defn summary [] (mtr/summary metrics))
 
@@ -74,35 +54,41 @@
 ;; ~~1. fix the damn logic here -- something went wrong deleting prn outputs~~
 ;; ~~2. plug the correct tictoc wrapper whatver it is~~
 ;; ~~3. this is very cool but meta dosn't propagate through more than one layer -- fix this and it's all done!~~
-;; 4. organize this file and delete everything that's not needed
-;; 5. test
-;; 6. test
+;; ~~4. need to transform all arg-meta lists into vectors. This quoting shit is getting old, unreadable and impossible to understand without fiddling for half a day. make all arg meta vectors, even if needs awkward/inefficient transforms; this all happens at compile time.
+;; clojure idiomatic way of adding an item at the beginning of a vector:
+;;   (into [:foo] [:bar :baz])
+;;   => [:foo :bar :baz]~~
+;; ~~5. it's gensym before keyword stupid~~
+;; 6. organize this file and delete everything that's not needed
+;; 7. write new summary that calculates fn args vs fn body
+;; 7. test
+;; 8. test
+
+(defn- push [v x] (if (vector? x) (into x v) (into [x] v)))
 
 (defn walker
   [stack form]
   (if (coll? form)
     (let [c (count form)
-          args-meta (filter some? (take c @stack))]
-      (swap! stack #(drop c %))
+          args-meta (into [] (filter some? (take c @stack)))]
+      (swap! stack #(into [] (drop c %)))
       (if (fn-call? form)
-        (let [fn-id' (fn-id form)
-              meta' (filter some? (map :fn-id args-meta))
-              meta'' (list {:arg-fns meta' :fn-id fn-id'})]
-          (swap! stack into meta'')
-          (wrap-tictoc** form fn-id' meta''))
-        (do (swap! stack into args-meta)
+        (let [fn-id (get-fn-id form)
+              arg-fns (into [] (filter some? (map :fn-id args-meta)))
+              fn-meta {:arg-fns arg-fns :fn-id fn-id}]
+          (swap! stack push fn-meta)
+          (wrap-tictoc form fn-id fn-meta))
+        (do (swap! stack push args-meta)
+            (prn @stack)
             form)))
-    (do (swap! stack into (list nil))
+    (do (swap! stack push nil)
         form)))
 
-(defn postwalk-
+(defn postwalk
   [f form]
-  (let [stack (atom '())
-        f' (partial f stack)]
-    (postwalk f' form)))
+  (let [stack (atom [])
+        f* (partial f stack)]
+    (clojure.walk/postwalk f* form)))
 
 
-(pprint (postwalk- walker '(let [n 5]
-    (doseq [i (range n)]
-      (println (str "Hello world! #" i))
-      (println (str (- n (inc i)) " more to go" ))))))
+(defmacro profile [& forms] `(do ~@(map (partial postwalk walker) forms)))
