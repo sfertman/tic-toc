@@ -6,7 +6,7 @@
 
 
 (defn matcher [s] (re-matches #":(.*)__\d+$" s))
-(defn get-fn-id [fn-id] (-> fn-id str matcher second))
+(defn get-fn-name [fn-id] (-> fn-id str matcher second))
 
 (defn add-stat
   [X x]
@@ -21,7 +21,7 @@
   [summary metric]
   (update
     summary
-    (-> metric :fn-id get-fn-id)
+    (-> metric :fn-id get-fn-name)
     add-stat
     (:time-ns metric)))
 
