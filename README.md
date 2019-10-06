@@ -34,13 +34,13 @@ Metrics are accumulated in an atom `metrics`. Collects run time in nanoseconds f
 (pprint (summary))
 
 ; =>
-; {"clojure.core/range" {:tot 112870.0, :cnt 1.0, :avg 112870.0},
-;  "clojure.core/str" {:tot 161584.0, :cnt 10.0, :avg 16158.4},
-;  "clojure.core/println" {:tot 2742432.0, :cnt 10.0, :avg 274243.2},
-;  "clojure.core/inc" {:tot 22670.0, :cnt 5.0, :avg 4534.0},
-;  "clojure.core/-" {:tot 82665.0, :cnt 5.0, :avg 16533.0},
-;  "clojure.core/doseq" {:tot 3342629.0, :cnt 1.0, :avg 3342629.0},
-;  "clojure.core/let" {:tot 3380295.0, :cnt 1.0, :avg 3380295.0}}
+; {"clojure.core/range" {:tot 112870.0, :calls 1.0, :avg 112870.0},
+;  "clojure.core/str" {:tot 161584.0, :calls 10.0, :avg 16158.4},
+;  "clojure.core/println" {:tot 2742432.0, :calls 10.0, :avg 274243.2},
+;  "clojure.core/inc" {:tot 22670.0, :calls 5.0, :avg 4534.0},
+;  "clojure.core/-" {:tot 82665.0, :calls 5.0, :avg 16533.0},
+;  "clojure.core/doseq" {:tot 3342629.0, :calls 1.0, :avg 3342629.0},
+;  "clojure.core/let" {:tot 3380295.0, :calls 1.0, :avg 3380295.0}}
 ; nil
 ```
 

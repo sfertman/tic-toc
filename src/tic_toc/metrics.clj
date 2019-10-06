@@ -11,10 +11,10 @@
 (defn add-stat
   [X x]
   (let [tot (+ (or (:tot X) 0.0) x)
-        cnt (+ (or (:cnt X) 0) 1)
-        avg (/ tot cnt)]
+        calls (+ (or (:calls X) 0) 1)
+        avg (/ tot calls)]
     {:tot tot
-     :cnt cnt
+     :calls calls
      :avg avg}))
 
 (defn summarizer
