@@ -43,27 +43,6 @@
         false)
       (catch Exception e false))))
 
-(defn summary [] (mtr/summary metrics))
-
-
-;; GIANT TODO
-;; this is the latest and greatest
-;; it uses a stack to track meta and this does not modify the forms
-;; it supports any clojure form that walk does simply because it doesn't
-;; try to get smart and uses postwalk
-;; ~~1. fix the damn logic here -- something went wrong deleting prn outputs~~
-;; ~~2. plug the correct tictoc wrapper whatver it is~~
-;; ~~3. this is very cool but meta dosn't propagate through more than one layer -- fix this and it's all done!~~
-;; ~~4. need to transform all arg-meta lists into vectors. This quoting shit is getting old, unreadable and impossible to understand without fiddling for half a day. make all arg meta vectors, even if needs awkward/inefficient transforms; this all happens at compile time.
-;; clojure idiomatic way of adding an item at the beginning of a vector:
-;;   (into [:foo] [:bar :baz])
-;;   => [:foo :bar :baz]~~
-;; ~~5. it's gensym before keyword stupid~~
-;; 6. organize this file and delete everything that's not needed
-;; 7. write new summary that calculates fn args vs fn body
-;; 7. test
-;; 8. test
-
 (defn- push [v x] (if (vector? x) (into x v) (into [x] v)))
 
 (defn walker
@@ -92,3 +71,9 @@
 
 
 (defmacro profile [& forms] `(do ~@(map (partial postwalk walker) forms)))
+
+(defn summary [] (mtr/summary metrics))
+
+(defn top
+  ([] (top 10))
+  ([n] (take n (sort-by second > (map (fn [[k v]] [k (:fn-time v)]) (summary))))))
