@@ -15,7 +15,7 @@
   [metrics]
   (reduce upsert {} (map-indexed (fn [i metric] [(:fn-id metric) i] ) metrics)))
 
-(defn args-time
+(defn- args-time*
   "Calculates argument time for a given metric"
   [metrics index metric]
   ;; ^^ may be problematic with recursion; possibly need to track; unique fn-id might save us here; test this to find out!
@@ -25,6 +25,7 @@
           arg-fns-times (map :time-ns arg-fns-metrics)]
       (apply + arg-fns-times))
     0))
+(def args-time (memoize args-time*))
 
 (defn matcher [s] (re-matches #":(.*)__\d+$" s))
 (defn get-fn-name [fn-id] (-> fn-id str matcher second))
