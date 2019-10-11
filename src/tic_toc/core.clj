@@ -77,3 +77,5 @@
 (defn top
   ([] (top 10))
   ([n] (take n (sort-by second > (map (fn [[k v]] [k (:fn-time v)]) (summary))))))
+
+(defn clear-session! [] (mtr/clear-all! metrics))
