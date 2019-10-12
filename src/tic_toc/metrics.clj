@@ -34,7 +34,6 @@
   [metrics index X x]
   (let [total-time (+ (or (:total-time X) 0) (:time-ns x))
         args-time* (args-time metrics index x)
-        ;; TODO: ^^ this is called multiple times to get same result; memoize?
         fn-time (- total-time args-time*)
         calls (+ (or (:calls X) 0) 1)]
     {:total-time total-time
