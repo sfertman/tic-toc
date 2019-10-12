@@ -20,10 +20,10 @@
   [metrics index metric]
   ;; ^^ may be problematic with recursion; possibly need to track; unique fn-id might save us here; test this to find out!
   (if-let [arg-fns (-> metric :meta :arg-fn)]
-    (let [arg-fns-idx (reduce concat (map #(get index %) arg-fns))
-          xform (comp (map #(nth metrics %))
+    (let [xform (comp (mapcat #(get index %))
+                      (map #(nth metrics %))
                       (map :time-ns))]
-      (transduce xform + arg-fns-idx))
+      (transduce xform + arg-fns))
     0))
 (def args-time (memoize args-time*))
 
