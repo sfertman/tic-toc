@@ -58,7 +58,7 @@
       metric)))
 
 (defn- summary* [metrics]
-  (let [summarizer* (partial summarizer @metrics (index-metrics @metrics))]
-    (reduce summarizer* {} @metrics)))
+  (let [summarizer* (partial summarizer metrics (index-metrics metrics))]
+    (reduce summarizer* {} metrics)))
 
 (def summary (memoize summary*))

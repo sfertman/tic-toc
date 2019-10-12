@@ -58,7 +58,6 @@
           (swap! stack push fn-meta)
           (wrap-tictoc form fn-id fn-meta))
         (do (swap! stack push args-meta)
-            (prn @stack)
             form)))
     (do (swap! stack push nil)
         form)))
@@ -72,7 +71,7 @@
 
 (defmacro profile [& forms] `(do ~@(map (partial postwalk walker) forms)))
 
-(defn summary [] (mtr/summary metrics))
+(defn summary [] (mtr/summary @metrics))
 
 (defn top
   ([] (top 10))
