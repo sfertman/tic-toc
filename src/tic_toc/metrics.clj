@@ -19,11 +19,11 @@
   "Calculates argument time for a given metric"
   [metrics index metric]
   ;; ^^ may be problematic with recursion; possibly need to track; unique fn-id might save us here; test this to find out!
-  (if-let [arg-fns (-> metric :meta :arg-fns)]
-    (let [arg-fns-idx (reduce into [] (map (fn [fn-id] (fn-id index)) arg-fns))
-          arg-fns-metrics (map (partial nth metrics) arg-fns-idx)
-          arg-fns-times (map :time-ns arg-fns-metrics)]
-      (apply + arg-fns-times))
+  (if-let [arg-fns (-> metric :meta :arg-fn)]
+    (let [arg-fns-idx (reduce concat (map #(get index %) arg-fns))
+          xform (comp (map #(nth metrics %))
+                      (map :time-ns))]
+      (transduce xform + arg-fns-idx))
     0))
 (def args-time (memoize args-time*))
 
@@ -36,17 +36,14 @@
         args-time* (args-time metrics index x)
         ;; TODO: ^^ this is called multiple times to get same result; memoize?
         fn-time (- total-time args-time*)
-        calls (+ (or (:calls X) 0) 1)
-        mean-total (double (/ total-time calls))
-        mean-args (double (/ args-time* calls))
-        mean-fn (double (/ fn-time calls))]
+        calls (+ (or (:calls X) 0) 1)]
     {:total-time total-time
      :args-time args-time*
      :fn-time fn-time
      :calls calls
-     :mean-total mean-total
-     :mean-args mean-args
-     :mean-fn mean-fn}))
+     :mean-total (double (/ total-time calls))
+     :mean-args (double (/ args-time* calls))
+     :mean-fn (double (/ fn-time calls))}))
 
 (defn summarizer
   [metrics index summary metric]
