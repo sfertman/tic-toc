@@ -19,7 +19,7 @@
   "Calculates argument time for a given metric"
   [metrics index metric]
   ;; ^^ may be problematic with recursion; possibly need to track; unique fn-id might save us here; test this to find out!
-  (if-let [arg-fns (-> metric :meta :arg-fn)]
+  (if-let [arg-fns (-> metric :meta :arg-fns)]
     (let [xform (comp (mapcat #(get index %))
                       (map #(nth metrics %))
                       (map :time-ns))]
