@@ -73,9 +73,11 @@
 
 (defn summary [] (mtr/summary @metrics))
 
-(defn top
-  ([] (top 10))
-  ([n] (top n :fn-time))
-  ([n k] (take n (sort-by second > (map (fn [[f f-sum]] [f (get f-sum k)]) (summary))))))
+(defn top*
+  ([s] (top* s 10))
+  ([s n] (top* s n :fn-time))
+  ([s n k] (take n (sort-by second > (map (fn [[f f-sum]] [f (get f-sum k)]) s)))))
+
+(defn top [& args] (apply top* (summary) args))
 
 (defn clear-session! [] (mtr/clear-all! metrics))
