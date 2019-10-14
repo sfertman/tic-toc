@@ -75,6 +75,7 @@
 
 (defn top
   ([] (top 10))
-  ([n] (take n (sort-by second > (map (fn [[k v]] [k (:fn-time v)]) (summary))))))
+  ([n] (top n :fn-time))
+  ([n k] (take n (sort-by second > (map (fn [[f f-sum]] [f (get f-sum k)]) (summary))))))
 
 (defn clear-session! [] (mtr/clear-all! metrics))
