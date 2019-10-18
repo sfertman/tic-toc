@@ -29,21 +29,24 @@
                           (map #(nth metrics %))
                           (map :time-ns)
                           (reduce +))))
-        args-time (fn [metric]
-                    (if-let [arg-fns (-> metric :meta :arg-fns seq)]
-                      (reduce + (map arg-fn-time arg-fns))
+        arg-fns (fn [metric] (-> metric :meta :arg-fns seq))
+        args-time (fn [arg-fns*]
+                    (if arg-fns*
+                      (reduce + (map arg-fn-time arg-fns*))
                       0))
-        add-stat (fn [old-val x]
-                    (let [total-time (+ (or (:total-time old-val) 0) (:time-ns x))
-                          args-time* (args-time x)
+        add-stat (fn [old-val metric]
+                    (let [total-time (+ (or (:total-time old-val) 0) (:time-ns metric))
+                          arg-fns* (arg-fns metric)
+                          args-time* (args-time arg-fns*)
                           fn-time (- total-time args-time*)
                           calls (+ (or (:calls old-val) 0) 1)]
                       {:total-time total-time
-                      :args-time args-time*
-                      :fn-time fn-time
-                      :calls calls
-                      :mean-total (double (/ total-time calls))
-                      :mean-args (double (/ args-time* calls))
-                      :mean-fn (double (/ fn-time calls))}))
+                       :arg-fns arg-fns*
+                       :args-time args-time*
+                       :fn-time fn-time
+                       :calls calls
+                       :mean-total (double (/ total-time calls))
+                       :mean-args (double (/ args-time* calls))
+                       :mean-fn (double (/ fn-time calls))}))
         summarizer (fn [s m] (update s (-> m :fn-id get-fn-name) add-stat m))]
     (reduce summarizer {} metrics)))
