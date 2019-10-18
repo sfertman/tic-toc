@@ -29,9 +29,9 @@
                           (map #(nth metrics %))
                           (map :time-ns)
                           (reduce +))))
-        arg-fns (fn [metric] (-> metric :meta :arg-fns seq))
+        arg-fns (fn [metric] (-> metric :arg-fns))
         args-time (fn [arg-fns*]
-                    (if arg-fns*
+                    (if (seq arg-fns*)
                       (reduce + (map arg-fn-time arg-fns*))
                       0))
         add-stat (fn [old-val metric]

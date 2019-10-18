@@ -9,7 +9,7 @@
 
 (defn collect!*
   ([fn-id t-ns] (collect!* fn-id t-ns {}))
-  ([fn-id t-ns m] (mtr/collect! metrics {:fn-id fn-id :time-ns t-ns :meta m})))
+  ([fn-id t-ns m] (mtr/collect! metrics (conj {:fn-id fn-id :time-ns t-ns} {:arg-fns (:arg-fns m)}))))
 
 (defn toc! ;; <-- using toc callback to clean timers up and collect metrics
   ([timer] (toc! timer {}))
@@ -31,8 +31,8 @@
     (toc! ~fn-id ~fn-meta)
     ret#))
 
-(defmacro get-meta* [form] (meta &form)) ;; works!
-(defn get-meta [form] (get-meta* form)) ;; works! but problm is returns this line number! Shieeet
+; (defmacro get-meta* [form] (meta &form)) ;; works!
+; (defn get-meta [form] (get-meta* form)) ;; works! but problm is returns this line number! Shieeet
 
 (defn fn-call? ;; this seems to work for the 80% case
   [form]
