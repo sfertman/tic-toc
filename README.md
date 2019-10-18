@@ -88,22 +88,19 @@ Alternatively, you can access the raw data and pipe it to your favourite data an
 ; =>
 ; ({:fn-id :clojure.core/range__1763,
 ;   :time-ns 113784,
-;   :meta {:arg-fns [], :fn-id :clojure.core/range__1763}}
+;   :arg-fns []}
 ;  {:fn-id :clojure.core/str__1764,
 ;   :time-ns 15726,
-;   :meta {:arg-fns [], :fn-id :clojure.core/str__1764}}
+;   :arg-fns []}
 ;  {:fn-id :clojure.core/println__1765,
 ;   :time-ns 415226,
-;   :meta
-;   {:arg-fns [:clojure.core/str__1764],
-;    :fn-id :clojure.core/println__1765}}
+;   :arg-fns [:clojure.core/str__1764]}
 ;  {:fn-id :clojure.core/inc__1766,
 ;   :time-ns 19302,
-;   :meta {:arg-fns [], :fn-id :clojure.core/inc__1766}}
+;   :arg-fns []}
 ;  {:fn-id :clojure.core/-__1767,
 ;   :time-ns 37854,
-;   :meta
-;   {:arg-fns [:clojure.core/inc__1766], :fn-id :clojure.core/-__1767}})
+;   :arg-fns [:clojure.core/inc__1766]})
 ; nil
 ```
 
