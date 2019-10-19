@@ -1,5 +1,7 @@
 # tic-toc
-Clojure code profiler. Very basic for now but possibly offers a quick and dirty way for exploratory optimization of bottlenecks. Does not drill down into fns definitions; does a simple postwalk on the input forms.<sup>*</sup>
+Clojure code profiler. Very basic for now but possibly offers a quick and dirty way for exploratory optimization of bottlenecks. Does not drill down into fns definitions; does a simple postwalk on the input forms<sup>*</sup> and dumps results in one big atom for analysis.
+
+[![Clojars Project](https://img.shields.io/clojars/v/tic-toc.svg)](https://clojars.org/tic-toc)
 
 ## Profiling
 Just wrap whatever with `profile` macro
