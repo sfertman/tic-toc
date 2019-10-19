@@ -14,9 +14,9 @@ Just wrap whatever with `profile` macro
 
 ; =>
 ; Hello world! #0
-; 4 more to go
+; 4999 more to go
 ; Hello world! #1
-; 3 more to go
+; 4998 more to go
 ; Hello world! #2
 ; ...
 ; ...
