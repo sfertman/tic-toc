@@ -73,11 +73,31 @@
 
 (defn summary [] (mtr/summary @metrics))
 
-(defn top*
-  ([s] (top* s 10))
-  ([s n] (top* s n :fn-time))
-  ([s n k] (take n (sort-by second > (map (fn [[f f-sum]] [f (get f-sum k)]) s)))))
+(defn- top-sort
+  ([s] (top-sort s 10))
+  ([s n] (top-sort s n :fn-time))
+  ([s n k] (take n (sort-by (fn [[_ f-sum]] (get f-sum k)) > s))))
 
-(defn top [& args] (apply top* (summary) args))
+(defn- round
+  "Round a double to the given precision (number of significant digits)"
+  ([d] (Math/round d))
+  ([d precision]
+    (let [factor (Math/pow 10 precision)]
+      (/ (Math/round (* d factor)) factor))))
+
+(defn top
+  "Returns a top n (default 10) list of summary s sorted by key k (default :fn-time). Usage:
+    - (top)
+    - (top 10)
+    - (top 10 :fn-time)
+  Each element in the list is a vector consisting of:
+    - ns qualified function name
+    - number of calls
+    - function execution time in seconds
+  e.g.: [\"my-ns/my-fn\" 42 1.234]
+  "
+  [& args]
+  (let [disp (fn [[k v]] [k (:calls v) (round (/ (:fn-time v) 1e9) 3)])]
+    (map disp (apply top-sort (summary) args))))
 
 (defn clear-session! [] (mtr/clear-all! metrics))
